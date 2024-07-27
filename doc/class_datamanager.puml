@@ -1,0 +1,29 @@
+@startuml DataManager class diagram
+title DataManager Class Diagram
+
+class DataManager {
+    -__folder_data
+}
+
+class FolderData {
+    -__folder_name
+    -__files
+    -__work_file
+}
+
+class FileData {
+    -__file_name
+    -__texts
+    -__is_ocr_executed
+}
+
+class TextData {
+    -__text
+    -__tr_text
+    -__position_info
+}
+
+DataManager::folder_data "1" *-- "1" FolderData : contains
+FolderData::__files "1" *-- "1..*" FileData : contains
+FileData::__texts "1" *-- "1..*" TextData : contains
+@enduml
