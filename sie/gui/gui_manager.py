@@ -1,6 +1,6 @@
-from sie.gui.top_frame import TopFrame
-from sie.gui.mid_frame import MidFrame
-from sie.gui.low_frame import LowFrame
+from sie.gui.frames.top_frame import TopFrame
+from sie.gui.frames.mid_frame import MidFrame
+from sie.gui.frames.low_frame import LowFrame
 
 class GuiManager:
     """
