@@ -1,5 +1,6 @@
 from sie.gui.top_frame import TopFrame
 from sie.gui.mid_frame import MidFrame
+from sie.gui.low_frame import LowFrame
 
 class GuiManager:
     """
@@ -23,3 +24,4 @@ class GuiManager:
         self.__root = root
         self.__top_frame = TopFrame(self.__root)
         self.__mid_frame = MidFrame(self.__root)
+        self.__low_frame = LowFrame(self.__root)
