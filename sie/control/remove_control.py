@@ -1,5 +1,7 @@
 
 from sie.gui.subframes.remove_frame import *
+from sie.data.data_manager import DataManager
+
 
 class RemoveTextListHandler(ScrollableListListener):
     def on_list_selected(self, index, text):
@@ -8,10 +10,20 @@ class RemoveTextListHandler(ScrollableListListener):
 class RemoveControl:
     def clicked_search_text():
         
-        # TODO: search OCR text from the image (now, fake data is used)
-        test_list = ["AAA", "BBB", "CCC", "DDD", "EEE", "FFF", "GGG", "HHH", "III", "JJJ", "KKK", "LLL"]
+        # TODO: search OCR text from the image (now, fake sample data is used)
+        test_list = [
+                ([[24, 48], [345, 48], [345, 109], [24, 109]], '下载手机天猫APP', 0.8471784057548907), 
+                ([[24, 130], [368, 130], [368, 204], [24, 204]], '享388元礼包', 0.9837027854197318), 
+                ([[190, 306], [290, 306], [290, 336], [190, 336]], '立即扫码', 0.9933473467826843), 
+                ([[160, 348], [334, 348], [334, 372], [160, 372]], '下载手机天猫APP领福利', 0.858102917437849)
+            ]
+        
+        # set text data to data manager
+        work_file = DataManager().get_work_file()
+        work_file.set_texts(test_list)
+        text_list = work_file.get_texts_as_string()
 
         # update list
         from sie.gui.gui_manager import GuiManager
         remove_frame = GuiManager().get_low_frame().get_remove_frame()
-        remove_frame.reset_text_list(test_list)
+        remove_frame.reset_text_list(text_list)

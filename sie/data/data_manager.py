@@ -93,7 +93,10 @@ class FileData:
     
     def get_text_by_index(self, index):
         return self.__texts[index]      # TextData 객체 반환
-    
+
+    def get_texts_as_string(self):
+        return [t.get_text()  for t in self.__texts]
+
 class TextData:
     def __init__(self, text, position):
         self.__text = text
