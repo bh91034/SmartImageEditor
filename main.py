@@ -5,15 +5,13 @@ from sie.data.data_manager import DataManager
 
 # 메인 애플리케이션 클래스
 class SmartImageEditor:
-    def __init__(self, root):
-        self.root = root
-        root.geometry('1200x600+20+20')
-        root.title('Smart Image Editor')
-
-        self.data_manager = DataManager()
-        self.gui_manager = GuiManager(root)
+    def __init__(self):
+        self.__data_manager = DataManager()
+        self.__gui_manager = GuiManager()
+    
+    def get_root(self):
+        return self.__gui_manager.get_root()
 
 if __name__ == "__main__":
-    root = Tk()
-    app = SmartImageEditor(root)
-    root.mainloop()
+    app = SmartImageEditor()
+    app.get_root().mainloop()

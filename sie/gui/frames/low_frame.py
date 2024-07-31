@@ -35,7 +35,19 @@ class LowFrame:
         low_frm.add(mosaic_tab, text='초상권보호')
 
         # init remove tab
-        self.remove_frame = RemoveFrame(remove_tab)
+        self.__remove_frame = RemoveFrame(remove_tab)
 
     def __tab_changed(self, event):
         print ('[LowFrame] __tabChanged() called...')
+
+    def get_remove_frame(self):
+        return self.__remove_frame
+    
+    def get_write_frame(self):
+        pass
+    
+    def get_edit_frame(self):
+        pass
+    
+    def get_mosaic_frame(self):
+        pass
