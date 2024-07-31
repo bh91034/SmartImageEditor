@@ -6,11 +6,20 @@ from PIL import ImageTk, Image
 from tkinter import END, IntVar, ttk
 from abc import *
 
+
+class PostDrawListner(metaclass=ABCMeta):
+    @abstractmethod
+    def do_post_draw(self, canvas, scale_ratio):
+        pass
+
+
 class FlexCanvas(tk.Canvas):
     def __init__(self, master=None, **kwargs):
         super().__init__(master, **kwargs)
         self.__image_path = None
         self.__image = None
+        self.__scale_ratio = 1
+        self.__post_draw_listeners = []
         self.bind("<Configure>", self.__on_resize)
 
     def set_image(self, image_path):
@@ -24,36 +33,49 @@ class FlexCanvas(tk.Canvas):
         # Store the current image
         self.__image = image
 
+    def __calculate_scale_ratio(self, w_org, h_org, w_resized, h_resized):
+        return w_resized/w_org
+
     def __draw_image(self):
-        if self.__image is not None:
-            # Convert the image from BGR to RGB
-            image = cv2.cvtColor(self.__image, cv2.COLOR_BGR2RGB)
+        # Check if image is available
+        if self.__image is None:
+            return
 
-            # Convert the image to a format Tkinter can use
-            image = Image.fromarray(image)
+        # Convert the image from BGR to RGB
+        image = cv2.cvtColor(self.__image, cv2.COLOR_BGR2RGB)
 
-            # Resize image to fit the canvas, maintaining aspect ratio
-            max_width, max_height = self.winfo_width(), self.winfo_height()
-            image.thumbnail((max_width, max_height))
+        # Convert the image to a format Tkinter can use
+        image = Image.fromarray(image)
+        w_org, h_org = image.size
 
-            # Create photo image
-            self.__photo = ImageTk.PhotoImage(image)
+        # Resize image to fit the canvas, maintaining aspect ratio
+        max_width, max_height = self.winfo_width(), self.winfo_height()
+        image.thumbnail((max_width, max_height))
+        w_resized, h_resized = image.size
 
-            # Clear the canvas and draw the new image
-            self.delete("all")
-            self.create_image(0, 0, image=self.__photo, anchor=tk.NW)
+        # Calculate scale ratio
+        self.__scale_ratio = self.__calculate_scale_ratio(w_org=w_org, h_org=h_org, w_resized=w_resized, h_resized=h_resized)
+
+        # Create photo image
+        self.__photo = ImageTk.PhotoImage(image)
+
+        # Clear the canvas and draw the new image
+        self.delete("all")
+        self.create_image(0, 0, image=self.__photo, anchor=tk.NW)
+
+        # callback listeners
+        for listener in self.__post_draw_listeners:
+            listener.do_post_draw(self.canvas, self.scale_ratio)
 
     def __on_resize(self, event):
         self.__draw_image()
 
-class CanvasWorkerPostDrawListner(metaclass=ABCMeta):
-    @abstractmethod
-    def do_post_draw(self, canvas, scale_ratio):
-        pass
-    
-class CanvasWorker:
+    def set_post_draw_listener(self, listener: PostDrawListner):
+        if listener not in self.__post_draw_listeners:
+            self.__post_draw_listeners.append(listener)
 
-    def set_post_draw_listener(self, listener: CanvasWorkerPostDrawListner):
+class CanvasWorker:
+    def set_post_draw_listener(self, listener: PostDrawListner):
         if listener not in self.listeners:
             self.listeners.append(listener)
 
@@ -123,9 +145,11 @@ class ScrollableListListener(metaclass=ABCMeta):
     def selected_radio_list(text):
         pass
 
+
 class ScrollableListType(Enum):
     CHECK_BUTTON = auto()
     RADIO_BUTTON = auto()
+
 
 class ScrollableList(tk.Frame):
     # note : the following 2 variables should be reset when image changes
