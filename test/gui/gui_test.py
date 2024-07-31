@@ -5,7 +5,7 @@ from tkinter import filedialog
 
 import sys
 sys.path.append('.')
-from sie.gui.common import CustomImageCanvas
+from sie.gui.utils.canvas_util import CustomImageCanvas
 
 class ImageApp:
     def __init__(self, root):
