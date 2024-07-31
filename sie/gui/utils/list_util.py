@@ -8,6 +8,18 @@ class ScrollableListListener(metaclass=ABCMeta):
     def on_list_selected(index, text):
         pass
 
+class ScrollableUtil:
+    def decode_text(encoded_text):
+        if not '|' in encoded_text:
+            return
+        parts = encoded_text.split('|')
+        number = int(parts[0])
+        text = parts[1]
+        return number, text
+
+    def encode_text(idx, text):
+        return str(idx) + '|' + text
+
 
 class ScrollableRadiobuttonList(tk.Frame):
     def __init__(self, parent, listener:ScrollableListListener, items):
@@ -47,7 +59,7 @@ class ScrollableRadiobuttonList(tk.Frame):
         print(f'###>>> selected_item={selected_item}')
         if selected_item is None or '|' not in selected_item:
             return
-        index, text = ScrollableRadiobuttonList.decode_text(selected_item)
+        index, text = ScrollableUtil.decode_text(selected_item)
 
         if self.__listener is not None:
             self.__listener.on_list_selected(index, text)
@@ -66,20 +78,9 @@ class ScrollableRadiobuttonList(tk.Frame):
         
         # Create new radio buttons
         for index, item in enumerate(items):
-            rb = tk.Radiobutton(self.__scrollable_frame, text=item, variable=self.__radio_var, value=ScrollableRadiobuttonList.encode_text(index, item))
+            rb = tk.Radiobutton(self.__scrollable_frame, text=item, variable=self.__radio_var, value=ScrollableUtil.encode_text(index, item))
             rb.pack(anchor="w")
             self.__radio_buttons.append(rb)
-
-    def decode_text(encoded_text):
-        if not '|' in encoded_text:
-            return
-        parts = encoded_text.split('|')
-        number = int(parts[0])
-        text = parts[1]
-        return number, text
-
-    def encode_text(idx, text):
-        return str(idx) + '|' + text
 
 
 class ScrollableCheckboxList(tk.Frame):
