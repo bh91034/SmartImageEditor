@@ -1,6 +1,8 @@
 #from msilib.schema import Control
 from tkinter import ttk
 
+from sie.gui.subframes.remove_frame import RemoveFrame
+
 #------------------------------------------------------------------------------
 # Low frame : low side tabbed pane (tools)
 #------------------------------------------------------------------------------
@@ -31,6 +33,9 @@ class LowFrame:
         low_frm.add(write_tab, text='텍스트쓰기')
         low_frm.add(edit_tab, text='이미지편집')
         low_frm.add(mosaic_tab, text='초상권보호')
+
+        # init remove tab
+        self.remove_frame = RemoveFrame(remove_tab)
 
     def __tab_changed(self, event):
         print ('[LowFrame] __tabChanged() called...')

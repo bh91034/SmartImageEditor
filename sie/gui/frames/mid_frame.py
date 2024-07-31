@@ -1,7 +1,8 @@
 import tkinter as tk
 
 from sie.data.data_manager import DataManager
-from sie.gui.common import CustomImageCanvas
+from sie.gui.utils.list_util import *
+from sie.gui.utils.canvas_util import *
 
 class MidFrame:
     """
