@@ -16,9 +16,13 @@ class CustomImageCanvas(tk.Canvas):
         super().__init__(master, **kwargs)
         self.__image_path = None
         self.__image = None
+        self.__cv2_image = None
         self.__scale_ratio = 1
         self.__post_draw_listeners = []
         self.bind("<Configure>", self.__on_resize)
+
+    def redraw_image(self):
+        self.__draw_image()
 
     def set_image(self, image_path):
         self.__image_path = image_path
@@ -40,10 +44,18 @@ class CustomImageCanvas(tk.Canvas):
             return
 
         # Convert the image from BGR to RGB
-        image = cv2.cvtColor(self.__image, cv2.COLOR_BGR2RGB)
+        self.__cv2_image = cv2.cvtColor(self.__image, cv2.COLOR_BGR2RGB)
 
+        # Draw cv2 image to canvas
+        self.__draw_cv2_image_to_canvas()
+
+        # callback listeners
+        for listener in self.__post_draw_listeners:
+            listener.do_post_draw(self, self.__scale_ratio)
+
+    def __draw_cv2_image_to_canvas(self):
         # Convert the image to a format Tkinter can use
-        image = Image.fromarray(image)
+        image = Image.fromarray(self.__cv2_image)
         w_org, h_org = image.size
 
         # Resize image to fit the canvas, maintaining aspect ratio
@@ -61,13 +73,17 @@ class CustomImageCanvas(tk.Canvas):
         self.delete("all")
         self.create_image(0, 0, image=self.__photo, anchor=tk.NW)
 
-        # callback listeners
-        for listener in self.__post_draw_listeners:
-            listener.do_post_draw(self.canvas, self.scale_ratio)
-
     def __on_resize(self, event):
         self.__draw_image()
 
     def set_post_draw_listener(self, listener: PostDrawListner):
         if listener not in self.__post_draw_listeners:
             self.__post_draw_listeners.append(listener)
+
+    def draw_rect(self, position_info):
+        x1 = position_info[0][0]
+        y1 = position_info[0][1]
+        x2 = position_info[2][0]
+        y2 = position_info[2][1]
+        cv2.rectangle(self.__cv2_image, (x1, y1), (x2, y2), color=(255,0,0), thickness=2)
+        self.__draw_cv2_image_to_canvas()

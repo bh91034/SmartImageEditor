@@ -1,7 +1,7 @@
 from tkinter import ttk
 
 from sie.gui.utils.list_util import *
-from sie.control.remove_control import RemoveTextListHandler, RemoveControl
+from sie.control.remove_control import RemoveTextListHandler, RemoveControl, RemovePostDrawHandler
 
 #------------------------------------------------------------------------------
 # Low frame - remove tab : low frame remove tab controls
@@ -28,5 +28,11 @@ class RemoveFrame:
         self.__remove_tab_text_list = ScrollableCheckboxList(self.__root, RemoveTextListHandler(), None)
         self.__remove_tab_text_list.pack(side="top", fill="x", expand=True)
 
+        from sie.gui.gui_manager import GuiManager
+        GuiManager().get_mid_frame().set_post_draw_listener(RemovePostDrawHandler())
+
     def reset_text_list(self, test_list):
         self.__remove_tab_text_list.update_items(test_list)
+
+    def get_check_list(self):
+        return self.__remove_tab_text_list

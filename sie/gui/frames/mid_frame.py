@@ -33,3 +33,11 @@ class MidFrame:
         # https://stackoverflow.com/questions/72713209/how-to-keep-two-textboxes-the-same-size-when-resizing-window-with-python-tkinter
         mid_frm.columnconfigure((0,1), weight=1)
         mid_frm.rowconfigure(0, weight=1)
+    
+    def redraw_images(self):
+        self.__src_canvas.redraw_image()
+        self.__out_canvas.redraw_image()
+
+    def set_post_draw_listener(self, listener:PostDrawListner):
+        self.__src_canvas.set_post_draw_listener(listener=listener)
+        self.__out_canvas.set_post_draw_listener(listener=listener)

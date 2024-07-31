@@ -133,3 +133,6 @@ class ScrollableCheckboxList(tk.Frame):
             cb.pack(anchor="w")
             self.__check_buttons.append(cb)
             self.__check_vars[item] = var
+
+    def get_check_vars(self):
+        return self.__check_vars

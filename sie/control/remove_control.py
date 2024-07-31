@@ -1,11 +1,32 @@
-
 from sie.gui.subframes.remove_frame import *
 from sie.data.data_manager import DataManager
+from sie.gui.utils.canvas_util import PostDrawListner
 
+
+class RemovePostDrawHandler(PostDrawListner):
+    def do_post_draw(self, canvas, scale_ratio):
+        print(f'RemovePostDrawHandler.do_post_draw() : scale_ratio={scale_ratio}')
+        
+        # get position info for the selected texts
+        from sie.gui.gui_manager import GuiManager
+        remove_frame = GuiManager().get_low_frame().get_remove_frame()
+
+        check_items = remove_frame.get_check_list().get_check_vars().items()
+        idx = 0
+        for item, var in check_items:
+            if var.get() == 1:
+                position_info = DataManager().get_work_file().get_text_by_index(idx).get_position_info()
+                canvas.draw_rect(position_info)
+            idx += 1
 
 class RemoveTextListHandler(ScrollableListListener):
     def on_list_selected(self, index, text):
         print(f'RemoveTextListHandler.on_list_selected() : index={index}, text={text}')
+
+        # redraw images to draw rect for selected text in work image
+        from sie.gui.gui_manager import GuiManager
+        GuiManager().get_mid_frame().redraw_images()
+
 
 class RemoveControl:
     def clicked_search_text():
