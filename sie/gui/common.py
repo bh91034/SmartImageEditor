@@ -13,7 +13,7 @@ class PostDrawListner(metaclass=ABCMeta):
         pass
 
 
-class FlexCanvas(tk.Canvas):
+class CustomImageCanvas(tk.Canvas):
     def __init__(self, master=None, **kwargs):
         super().__init__(master, **kwargs)
         self.__image_path = None

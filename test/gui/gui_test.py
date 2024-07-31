@@ -5,7 +5,7 @@ from tkinter import filedialog
 
 import sys
 sys.path.append('.')
-from sie.gui.common import FlexCanvas
+from sie.gui.common import CustomImageCanvas
 
 class ImageApp:
     def __init__(self, root):
@@ -39,7 +39,7 @@ class ImageApp:
         self.next_button.pack(side=tk.LEFT)
 
         # Canvas to display images
-        self.canvas = FlexCanvas(self.root, bg='gray')
+        self.canvas = CustomImageCanvas(self.root, bg='gray')
         self.canvas.pack(fill=tk.BOTH, expand=True)
 
         # Folder change

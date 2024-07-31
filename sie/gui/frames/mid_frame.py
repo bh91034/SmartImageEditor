@@ -1,7 +1,7 @@
 import tkinter as tk
 
 from sie.data.data_manager import DataManager
-from sie.gui.common import FlexCanvas
+from sie.gui.common import CustomImageCanvas
 
 class MidFrame:
     """
@@ -17,9 +17,9 @@ class MidFrame:
         self.__root = mid_frm
         mid_frm.pack(padx=2, pady=2, fill='both', expand=True)
 
-        self.__src_canvas = FlexCanvas(mid_frm)
+        self.__src_canvas = CustomImageCanvas(mid_frm)
         self.__src_canvas.grid(row=0, column=0, sticky=tk.E+tk.W+tk.N+tk.S)
-        self.__out_canvas = FlexCanvas(mid_frm)
+        self.__out_canvas = CustomImageCanvas(mid_frm)
         self.__out_canvas.grid(row=0, column=1, sticky=tk.E+tk.W+tk.N+tk.S)
 
         src_file = DataManager().get_work_file().to_string()
