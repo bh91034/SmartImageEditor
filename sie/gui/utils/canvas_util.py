@@ -80,10 +80,10 @@ class CustomImageCanvas(tk.Canvas):
         if listener not in self.__post_draw_listeners:
             self.__post_draw_listeners.append(listener)
 
-    def draw_rect(self, position_info):
+    def draw_rect(self, position_info, color=(255,255,0)):
         x1 = position_info[0][0]
         y1 = position_info[0][1]
         x2 = position_info[2][0]
         y2 = position_info[2][1]
-        cv2.rectangle(self.__cv2_image, (x1, y1), (x2, y2), color=(255,0,0), thickness=2)
+        cv2.rectangle(self.__cv2_image, (x1, y1), (x2, y2), color=color, thickness=2)
         self.__draw_cv2_image_to_canvas()
