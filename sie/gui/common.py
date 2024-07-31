@@ -1,9 +1,50 @@
+import cv2
 import tkinter as tk
 
 from enum import Enum, auto
 from PIL import ImageTk, Image
 from tkinter import END, IntVar, ttk
 from abc import *
+
+class FlexCanvas(tk.Canvas):
+    def __init__(self, master=None, **kwargs):
+        super().__init__(master, **kwargs)
+        self.__image_path = None
+        self.__image = None
+        self.bind("<Configure>", self.__on_resize)
+
+    def set_image(self, image_path):
+        self.__image_path = image_path
+        self.__load_image()
+        self.__draw_image()
+
+    def __load_image(self):
+        image = cv2.imread(self.__image_path)
+
+        # Store the current image
+        self.__image = image
+
+    def __draw_image(self):
+        if self.__image is not None:
+            # Convert the image from BGR to RGB
+            image = cv2.cvtColor(self.__image, cv2.COLOR_BGR2RGB)
+
+            # Convert the image to a format Tkinter can use
+            image = Image.fromarray(image)
+
+            # Resize image to fit the canvas, maintaining aspect ratio
+            max_width, max_height = self.winfo_width(), self.winfo_height()
+            image.thumbnail((max_width, max_height))
+
+            # Create photo image
+            self.__photo = ImageTk.PhotoImage(image)
+
+            # Clear the canvas and draw the new image
+            self.delete("all")
+            self.create_image(0, 0, image=self.__photo, anchor=tk.NW)
+
+    def __on_resize(self, event):
+        self.__draw_image()
 
 class CanvasWorkerPostDrawListner(metaclass=ABCMeta):
     @abstractmethod
