@@ -25,7 +25,7 @@ class RemoveFrame:
         remove_tab_down_frm = ttk.Frame(root)
         remove_tab_down_frm.pack(padx=2, pady=2, fill='both', expand=True)
         
-        self.__remove_tab_text_list = ScrollableCheckboxList(self.__root, RemoveTextListHandler(), None)
+        self.__remove_tab_text_list = ScrollableList(self.__root, RemoveTextListHandler(), None, ScrollableListType.CHECK_BUTTON)
         self.__remove_tab_text_list.pack(side="top", fill="x", expand=True)
 
         from sie.gui.gui_manager import GuiManager

@@ -11,13 +11,20 @@ class RemovePostDrawHandler(PostDrawListner):
         from sie.gui.gui_manager import GuiManager
         remove_frame = GuiManager().get_low_frame().get_remove_frame()
 
-        check_items = remove_frame.get_check_list().get_check_vars().items()
-        idx = 0
-        for item, var in check_items:
-            if var.get() == 1:
-                position_info = DataManager().get_work_file().get_text_by_index(idx).get_position_info()
-                canvas.draw_rect(position_info)
-            idx += 1
+        if remove_frame.get_check_list().get_type() == ScrollableListType.CHECK_BUTTON:
+            check_items = remove_frame.get_check_list().get_check_vars().items()
+            idx = 0
+            for item, var in check_items:
+                if var.get() == 1:
+                    position_info = DataManager().get_work_file().get_text_by_index(idx).get_position_info()
+                    canvas.draw_rect(position_info)
+                idx += 1
+        if remove_frame.get_check_list().get_type() == ScrollableListType.RADIO_BUTTON:
+            radio_var = remove_frame.get_check_list().get_radio_var()
+            val = None
+            if radio_var:
+                val = radio_var.get()
+            print(f'########> RADIO VAR={radio_var}, get={val}')
 
 class RemoveTextListHandler(ScrollableListListener):
     def on_list_selected(self, index, text):

@@ -1,7 +1,7 @@
 import tkinter as tk
 
 from abc import *
-
+from enum import Enum, auto
 
 class ScrollableListListener(metaclass=ABCMeta):
     @abstractmethod
@@ -21,17 +21,28 @@ class ScrollableUtil:
         return str(idx) + '|' + text
 
 
-class ScrollableRadiobuttonList(tk.Frame):
-    def __init__(self, parent, listener:ScrollableListListener, items):
+# Enum to specify the type of list to create
+class ScrollableListType(Enum):
+    CHECK_BUTTON = auto()
+    RADIO_BUTTON = auto()
+
+
+class ScrollableList(tk.Frame):
+    def __init__(self, parent, listener, items, list_type: ScrollableListType):
         super().__init__(parent)
 
         # instance variables
-        self.__radio_var = tk.StringVar()  # Variable shared among all radio buttons
-        self.__radio_buttons = []  # List to hold references to radio buttons
-        self.__scrollable_frame = None
+        self.__list_type = list_type
         self.__listener = listener
+        self.__items = items
+        
+        # Common variables
+        self.__scrollable_frame = None
+        self.__radio_var = None
+        self.__check_vars = {}  # Used only for CHECK_BUTTON type
+        self.__buttons = []  # To hold references to checkbuttons or radiobuttons
 
-        # 
+        # Setup canvas and scrollbar
         canvas = tk.Canvas(self)
         scrollbar = tk.Scrollbar(self, orient="vertical", command=canvas.yview)
         self.__scrollable_frame = tk.Frame(canvas)
@@ -46,14 +57,16 @@ class ScrollableRadiobuttonList(tk.Frame):
         canvas.create_window((0, 0), window=self.__scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
         
-        self.__radio_var.trace_add('write', self.__on_radio_change)  # Add a trace to call on_radio_change when radio_var changes
-        
         if items is not None and len(items) > 0:
-            self.update_items(items)  # Initialize with initial items
+            self.update_items(items)
         
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
+    def __on_checkbox_change(self, index, item):
+        if self.__listener is not None:
+            self.__listener.on_list_selected(index, item)
+    
     def __on_radio_change(self, *args):
         selected_item = self.__radio_var.get()
         print(f'###>>> selected_item={selected_item}')
@@ -64,75 +77,47 @@ class ScrollableRadiobuttonList(tk.Frame):
         if self.__listener is not None:
             self.__listener.on_list_selected(index, text)
 
+    def get_type(self):
+        return self.__list_type
+    
     def update_items(self, items):
-        # Clear existing radio buttons
-        for rb in self.__radio_buttons:
-            rb.destroy()
-        self.__radio_buttons.clear()
+        # Clear existing buttons
+        for btn in self.__buttons:
+            btn.destroy()
+        self.__buttons.clear()
         
-        # Update the radio_var with the first item
-        if items:
-            self.__radio_var.set(items[0])  # Set to the first item to select it
-        else:
-            self.__radio_var.set("")  # Clear the selection if no items
+        if self.__list_type == ScrollableListType.RADIO_BUTTON:
+            self.__radio_var = tk.StringVar()  # Create radio variable
+            self.__radio_var.trace_add('write', self.__on_radio_change)  # Trace radio var changes
+            
+            if items:
+                self.__radio_var.set(items[0])  # Select the first item initially
+            else:
+                self.__radio_var.set("")  # Clear selection if no items
+            
+            # Create new radio buttons
+            for index, item in enumerate(items):
+                rb = tk.Radiobutton(self.__scrollable_frame, text=item, variable=self.__radio_var, value=ScrollableUtil.encode_text(index, item))
+                rb.pack(anchor="w")
+                self.__buttons.append(rb)
         
-        # Create new radio buttons
-        for index, item in enumerate(items):
-            rb = tk.Radiobutton(self.__scrollable_frame, text=item, variable=self.__radio_var, value=ScrollableUtil.encode_text(index, item))
-            rb.pack(anchor="w")
-            self.__radio_buttons.append(rb)
+        elif self.__list_type == ScrollableListType.CHECK_BUTTON:
+            # Create new check buttons
+            for index, item in enumerate(items):
+                var = tk.IntVar()  # Create a variable for each checkbox
+                var.trace_add('write', lambda *args, index=index, item=item: self.__on_checkbox_change(index, item))
+                cb = tk.Checkbutton(self.__scrollable_frame, text=item, variable=var)
+                cb.pack(anchor="w")
+                self.__buttons.append(cb)
+                self.__check_vars[item] = var
 
-
-class ScrollableCheckboxList(tk.Frame):
-    def __init__(self, parent, listener, items):
-        super().__init__(parent)
+    def get_radio_var(self):
+        return self.__radio_var
         
-        # instance variables
-        self.__check_vars = {}  # Dictionary to hold the IntVar for each checkbox
-        self.__check_buttons = []  # List to hold references to checkbuttons
-        self.__scrollable_frame = None
-        self.__listener = listener
-
-        canvas = tk.Canvas(self)
-        scrollbar = tk.Scrollbar(self, orient="vertical", command=canvas.yview)
-        self.__scrollable_frame = tk.Frame(canvas)
-        
-        self.__scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(
-                scrollregion=canvas.bbox("all")
-            )
-        )
-        
-        canvas.create_window((0, 0), window=self.__scrollable_frame, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set)
-        
-        if items is not None and len(items) > 0:
-            self.update_items(items)  # Initialize with initial items
-        
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-
-    def __on_checkbox_change(self, index, item):
-        if self.__listener is not None:
-            self.__listener.on_list_selected(index, item)
-
-    def update_items(self, items):
-        # Clear existing checkbuttons
-        for cb in self.__check_buttons:
-            cb.destroy()
-        self.__check_buttons.clear()
-        
-        self.__check_vars.clear()  # Clear the variable dictionary
-        
-        # Create new checkbuttons
-        for index, item in enumerate(items):
-            var = tk.IntVar()  # Create a variable for each checkbox
-            var.trace_add('write', lambda *args, index=index, item=item: self.__on_checkbox_change(index, item))
-            cb = tk.Checkbutton(self.__scrollable_frame, text=item, variable=var)
-            cb.pack(anchor="w")
-            self.__check_buttons.append(cb)
-            self.__check_vars[item] = var
-
     def get_check_vars(self):
-        return self.__check_vars
+        if self.__list_type == ScrollableListType.CHECK_BUTTON:
+            return self.__check_vars
+        elif self.__list_type == ScrollableListType.RADIO_BUTTON:
+            return self.__radio_var
+        else:
+            raise ValueError("get_check_vars is only available for CHECK_BUTTON type.")
