@@ -4,8 +4,8 @@ from sie.gui.utils.canvas_util import PostDrawListner
 
 
 class RemovePostDrawHandler(PostDrawListner):
-    def do_post_draw(self, canvas, scale_ratio):
-        print(f'RemovePostDrawHandler.do_post_draw() : scale_ratio={scale_ratio}')
+    def do_post_draw(self, canvas, image_reduced_ratio):
+        print(f'RemovePostDrawHandler.do_post_draw() : reduced_ratio={image_reduced_ratio}')
         
         # get position info for the selected texts
         from sie.gui.gui_manager import GuiManager
