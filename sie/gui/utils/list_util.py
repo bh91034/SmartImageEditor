@@ -82,6 +82,13 @@ class ScrollableRadiobuttonList(tk.Frame):
             rb.pack(anchor="w")
             self.__radio_buttons.append(rb)
 
+    def get_selected_items(self):
+        selected_item = self.__radio_var.get()
+        if selected_item:
+            index, text = ScrollableUtil.decode_text(selected_item)
+            return [[index, text]]
+        return []
+
 
 class ScrollableCheckboxList(tk.Frame):
     def __init__(self, parent, listener, items):
