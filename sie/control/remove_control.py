@@ -5,19 +5,19 @@ from sie.gui.utils.canvas_util import PostDrawListner
 
 class RemovePostDrawHandler(PostDrawListner):
     def do_post_draw(self, canvas, image_reduced_ratio):
-        print(f'RemovePostDrawHandler.do_post_draw() : reduced_ratio={image_reduced_ratio}')
-        
-        # get position info for the selected texts
+       
+        # get selected items
         from sie.gui.gui_manager import GuiManager
-        remove_frame = GuiManager().get_low_frame().get_remove_frame()
+        check_list = GuiManager().get_low_frame().get_remove_frame().get_check_list()
+        selected_items = check_list.get_selected_items()
+        if selected_items is None or len(selected_items) == 0:
+            return
 
-        check_items = remove_frame.get_check_list().get_check_vars().items()
-        idx = 0
-        for item, var in check_items:
-            if var.get() == 1:
-                position_info = DataManager().get_work_file().get_text_by_index(idx).get_position_info()
-                canvas.draw_rect(position_info)
-            idx += 1
+        # draw rect on image for selected text
+        for item in selected_items:
+            position_info = DataManager().get_work_file().get_text_by_index(item[0]).get_position_info()
+            canvas.draw_rect(position_info)
+
 
 class RemoveTextListHandler(ScrollableListListener):
     def on_list_selected(self, index, text):

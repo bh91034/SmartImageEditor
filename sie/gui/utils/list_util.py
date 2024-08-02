@@ -113,9 +113,10 @@ class ScrollableCheckboxList(tk.Frame):
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
-    def __on_checkbox_change(self, index, item):
-        if self.__listener is not None:
-            self.__listener.on_list_selected(index, item)
+    def __on_checkbox_change(self, *args):
+        for index, item in enumerate(self.__check_buttons):
+            if self.__listener is not None:
+                self.__listener.on_list_selected(index, item.cget("text"))
 
     def update_items(self, items):
         # Clear existing checkbuttons
@@ -128,11 +129,15 @@ class ScrollableCheckboxList(tk.Frame):
         # Create new checkbuttons
         for index, item in enumerate(items):
             var = tk.IntVar()  # Create a variable for each checkbox
-            var.trace_add('write', lambda *args, index=index, item=item: self.__on_checkbox_change(index, item))
+            var.trace_add('write', self.__on_checkbox_change)
             cb = tk.Checkbutton(self.__scrollable_frame, text=item, variable=var)
             cb.pack(anchor="w")
             self.__check_buttons.append(cb)
             self.__check_vars[item] = var
 
-    def get_check_vars(self):
-        return self.__check_vars
+    def get_selected_items(self):
+        selected_items = []
+        for index, cb in enumerate(self.__check_buttons):
+            if self.__check_vars[cb.cget("text")].get() == 1:
+                selected_items.append([index, cb.cget("text")])
+        return selected_items
