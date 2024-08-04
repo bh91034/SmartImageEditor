@@ -15,13 +15,16 @@ class RemovePostDrawHandler(PostDrawListner):
 
         # draw rect on image for selected text
         for item in selected_items:
-            position_info = DataManager().get_work_file().get_text_by_index(item[0]).get_position_info()
+            position_info = DataManager().get_work_file().get_text_by_index(item["index"]).get_position_info()
             canvas.draw_rect(position_info)
 
 
-class RemoveTextListHandler(ScrollableListListener):
-    def on_list_selected(self, index, text):
-        print(f'RemoveTextListHandler.on_list_selected() : index={index}, text={text}')
+class RemoveTextListListener(ScrollableListListener):
+    def on_state_changed(self, index, text, state, selected_items):
+        print(f'RemoveTextListListener.on_list_selected() : index={index}, text={text}, state={state}')
+        if selected_items is not None and len(selected_items) > 0:
+            for idx, item in enumerate(selected_items):
+                print(f'     - index={item["index"]}, text={item["text"]}')
 
         # redraw images to draw rect for selected text in work image
         from sie.gui.gui_manager import GuiManager
