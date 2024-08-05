@@ -14,13 +14,9 @@ class RemoveFrame:
         frame_btn = ttk.Frame(root)
         frame_btn.pack(padx=2, pady=2, fill='x')
         
-        btn_search_text = ttk.Button(frame_btn, text='텍스트 찾기', command=RemoveControl.clicked_search_text)
-        btn_remove_text = ttk.Button(frame_btn, text='텍스트 지우기')
-        btn_revoke_image = ttk.Button(frame_btn, text='원상태 복원')
-
-        btn_search_text.pack(side='left')
-        btn_remove_text.pack(side='left')
-        btn_revoke_image.pack(side='left')
+        self.__set_alignment(ttk.Button(frame_btn, text='텍스트 찾기', command=RemoveControl.clicked_search_text), 'left')
+        self.__set_alignment(ttk.Button(frame_btn, text='텍스트 지우기'), 'left')
+        self.__set_alignment(ttk.Button(frame_btn, text='원상태 복원'), 'left')
 
         remove_tab_down_frm = ttk.Frame(root)
         remove_tab_down_frm.pack(padx=2, pady=2, fill='both', expand=True)
@@ -30,6 +26,10 @@ class RemoveFrame:
 
         from sie.gui.gui_manager import GuiManager
         GuiManager().get_mid_frame().set_post_draw_listener(RemovePostDrawHandler())
+
+    def __set_alignment(self, component, align:str):
+        component.pack(side=align)
+        return component
 
     def reset_text_list(self, test_list):
         self.__remove_tab_text_list.update_items(test_list)

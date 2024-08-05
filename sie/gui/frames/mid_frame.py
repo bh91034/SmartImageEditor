@@ -15,7 +15,6 @@ class MidFrame:
 
         # middle canvases frame
         mid_frm = tk.Frame(root)
-        self.__root = mid_frm
         mid_frm.pack(padx=2, pady=2, fill='both', expand=True)
 
         self.__src_canvas = CustomImageCanvas(mid_frm)
